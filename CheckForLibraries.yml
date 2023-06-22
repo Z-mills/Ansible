@@ -1,0 +1,27 @@
+---
+- name: Check development libraries on remote hosts
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Check for development libraries
+      become: true
+      shell: 'if rpm -q {{ item }} > /dev/null 2>&1 ; then echo "installed"; else echo "not installed"; fi'
+      register: library_status
+      with_items:
+        - gcc
+        - make
+        - autoconf
+        - automake
+        - libtool
+        - zlib-devel
+        - openssl-devel
+        - readline-devel
+        - sqlite-devel
+        - bzip2-devel
+
+    - name: Display library status
+      debug:
+        msg: "{{ inventory_hostname }} - {{ item.item }} is {{ item.stdout }}"
+      with_items: "{{ library_status.results }}"

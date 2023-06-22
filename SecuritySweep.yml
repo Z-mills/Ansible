@@ -1,0 +1,32 @@
+- name: Check for Security Updates and Firewall Status
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Update the package cache
+      yum:
+        update_cache: yes
+
+    - name: Check for security updates
+      yum:
+        list: security
+      register: security_updates
+
+    - name: Display security updates
+      debug:
+        msg: "Host {{ inventory_hostname }} needs security updates: {{ security_updates.packages|default([]) }}"
+
+    - name: Check firewalld status
+      shell: systemctl is-active firewalld
+      register: firewalld_status
+      ignore_errors: true
+
+    - name: Check iptables status
+      shell: systemctl is-active iptables
+      register: iptables_status
+      ignore_errors: true
+
+    - name: Display firewall and iptables status
+      debug:
+        msg: "Host {{ inventory_hostname }} has firewalld status {{ firewalld_status.stdout|default('unknown') }} and iptables status {{ iptables_status.stdout|default('unknown') }}."

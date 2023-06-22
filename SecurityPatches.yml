@@ -1,0 +1,43 @@
+---
+- name: Detect OS and run specific tasks
+  hosts: all
+  gather_facts: yes
+
+  tasks:
+    - name: CentOS and Rocky task
+      when: ansible_facts['distribution'] in ['CentOS', 'Rocky']
+      yum:
+        name: '*'
+        state: latest
+        security: yes
+      become: yes
+
+    - name: RHEL 8 task
+      when: ansible_facts['distribution'] == 'RedHat' and ansible_facts['distribution_major_version'] == '8'
+      yum:
+        name: '*'
+        state: latest
+        security: yes
+      become: yes
+
+    - name: RHEL 7 task
+      when: ansible_facts['distribution'] == 'RedHat' and ansible_facts['distribution_major_version'] == '7'
+      yum:
+        name: '*'
+        state: latest
+        security: yes
+      become: yes
+
+    - name: Ubuntu 18.04 and above task
+      when: ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_version'] | version_compare('18.04', '>=')
+      apt:
+        upgrade: 'security'
+      become: yes
+
+    - name: AWS Linux task
+      when: ansible_facts['distribution'] == 'Amazon' and 'amzn2' in ansible_facts['distribution_version']
+      yum:
+        name: '*'
+        state: latest
+        security: yes
+      become: yes

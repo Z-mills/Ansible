@@ -1,0 +1,23 @@
+---
+- name: Install Duplicity
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install EPEL
+      ansible.builtin.yum:
+        name: epel-release
+        state: present
+
+    - name: Install a list of packages
+      ansible.builtin.yum:
+        name:
+          - duplicity  
+          - python-paramiko
+          - python-boto
+        state: present
+
+    - name: Install and configure duplicity
+      shell: |
+        duplicity /path/to/source/ sftp://user@remote/path/to/destination/
+        echo "0 0 * * * duplicity /path/to/source/ sftp://user@remote/path/to/destination/" | sudo tee -a /var/spool/cron/root

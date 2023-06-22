@@ -1,0 +1,14 @@
+---
+- name: See release
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Run command with shell module
+      shell: |
+        echo "$(grep PRETTY_NAME /etc/os-release) $(ip -4 addr show | grep -o 'inet [0-9]\\+\\.[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+' | pa$
+      register: result
+
+    - name: Print the output
+      debug:
+        var: result.stdout
